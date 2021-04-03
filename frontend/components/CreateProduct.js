@@ -1,6 +1,37 @@
+import { useMutation } from '@apollo/client';
+import gql from 'graphql-tag';
 import React, { useState } from 'react';
 import useForm from '../lib/useForm';
 import Form from './styles/Form';
+import DisplayError from './ErrorMessage';
+
+const CREATE_PRODUCT_MUTATION = gql`
+  mutation CREATE_PRODUCT_MUTATION(
+    # which variables are getting passed in and their types
+    # ! means required
+    $name: String!
+    $description: String!
+    $price: Int!
+    $image: Upload
+  ) {
+    createProduct(
+      data: {
+        name: $name
+        description: $description
+        price: $price
+        status: "AVAILABLE"
+        # this is a nested create specific to keystone cms.
+        # creates the ProductPhoto and the product
+        photo: { create: { image: $image, altText: $name } }
+      }
+    ) {
+      id
+      price
+      description
+      name
+    }
+  }
+`;
 
 function CreateProduct() {
   // destructuring the exports from the function into these variables
@@ -11,15 +42,25 @@ function CreateProduct() {
     description: 'these are the coolest shoes',
   });
 
-  function handleSubmit(e) {
+  // returns same three properties that a query does but also one to fire off the mutation
+  const [createProduct, { loading, error, data }] = useMutation(
+    CREATE_PRODUCT_MUTATION,
+    {
+      variables: inputs,
+    }
+  );
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log(inputs);
+    await createProduct();
+    clearForm();
   }
 
   return (
     <Form onSubmit={handleSubmit}>
+      <DisplayError error={error} />
       {/* field set allows you to control a group of inputs at a time */}
-      <fieldset>
+      <fieldset disabled={loading} aria-busy={loading}>
         <label htmlFor="image">
           Image
           <input type="file" id="image" name="image" onChange={handleChange} />
