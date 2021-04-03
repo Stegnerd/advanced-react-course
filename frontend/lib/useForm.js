@@ -11,14 +11,14 @@ export default function useForm(initial = {}) {
     if (type === 'number') {
       value = parseInt(value);
     } else if (type === 'file') {
-      value[0] = e.target.files;
+      [value] = e.target.files;
     }
 
     setInputs({
       // copy the existing state
       ...inputs,
       // makes a dynamic so we only change the key that is being modified
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     });
   }
 
