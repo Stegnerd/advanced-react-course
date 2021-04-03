@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import useForm from '../lib/useForm';
 import Form from './styles/Form';
 import DisplayError from './ErrorMessage';
+import { ALL_PRODUCTS_QUERY } from './Products';
 
 const CREATE_PRODUCT_MUTATION = gql`
   mutation CREATE_PRODUCT_MUTATION(
@@ -47,6 +48,8 @@ function CreateProduct() {
     CREATE_PRODUCT_MUTATION,
     {
       variables: inputs,
+      // refetch the data once we upload
+      refetchQueries: [{ query: ALL_PRODUCTS_QUERY }],
     }
   );
 
