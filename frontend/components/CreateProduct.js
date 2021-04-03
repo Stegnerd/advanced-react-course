@@ -1,6 +1,7 @@
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import React, { useState } from 'react';
+import Router from 'next/router';
 import useForm from '../lib/useForm';
 import Form from './styles/Form';
 import DisplayError from './ErrorMessage';
@@ -55,8 +56,13 @@ function CreateProduct() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await createProduct();
+    // wait for data to be posted
+    const response = await createProduct();
     clearForm();
+    // programmatically route to the list page
+    Router.push({
+      pathname: `/product/${response.data.createProduct.id}`,
+    });
   }
 
   return (
